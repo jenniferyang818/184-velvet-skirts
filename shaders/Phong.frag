@@ -19,7 +19,7 @@ void main() {
   ambient_coeff = 0.1;
   // we pick this
   vec3 ambient_illum;
-  ambient_illum = vec3(1, 1, 1);
+  ambient_illum = vec3(0, 0, 0);
 
   vec4 ambient = vec4(ambient_coeff * ambient_illum, 1);
 
@@ -53,7 +53,7 @@ void main() {
   vec3 bisector = (l_vector + cam_vector) / length(l_vector + cam_vector);
   //we pick this
   float p;
-  p = 100.0;
+  p = 1/0.15; //100.0;
   max_thing = pow(max(0.0, dot(normalize(v_normal), vec4(normalize(bisector), 1))), p);
   vec4 specular;
   specular = specular_coeff * vec4(illum * max_thing, 1);
