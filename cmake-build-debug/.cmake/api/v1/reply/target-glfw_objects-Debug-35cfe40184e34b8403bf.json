@@ -104,7 +104,7 @@
 			"compileCommandFragments" : 
 			[
 				{
-					"fragment" : " -Wno-deprecated-declarations -g -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk -fPIC"
+					"fragment" : " -Wno-deprecated-declarations -g -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk -mmacosx-version-min=10.15 -fPIC"
 				},
 				{
 					"backtrace" : 2,
@@ -130,15 +130,15 @@
 			[
 				{
 					"backtrace" : 5,
-					"path" : "/Users/jennifer/Desktop/cs184/p4-clothsim/ext/nanogui/ext/glfw/include"
+					"path" : "/Users/kaionamartinson/Desktop/cs 184/184-velvet-skirts/ext/nanogui/ext/glfw/include"
 				},
 				{
 					"backtrace" : 6,
-					"path" : "/Users/jennifer/Desktop/cs184/p4-clothsim/ext/nanogui/ext/glfw/src"
+					"path" : "/Users/kaionamartinson/Desktop/cs 184/184-velvet-skirts/ext/nanogui/ext/glfw/src"
 				},
 				{
 					"backtrace" : 6,
-					"path" : "/Users/jennifer/Desktop/cs184/p4-clothsim/cmake-build-debug/ext/nanogui/ext_build/glfw/src"
+					"path" : "/Users/kaionamartinson/Desktop/cs 184/184-velvet-skirts/cmake-build-debug/ext/nanogui/ext_build/glfw/src"
 				}
 			],
 			"language" : "C",

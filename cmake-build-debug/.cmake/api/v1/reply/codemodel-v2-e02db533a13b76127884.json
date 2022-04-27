@@ -107,7 +107,7 @@
 				{
 					"build" : "src",
 					"hasInstallRule" : true,
-					"jsonFile" : "directory-src-Debug-cb6ac740752fcc6fc471.json",
+					"jsonFile" : "directory-src-Debug-c420832e290818446baf.json",
 					"minimumCMakeVersion" : 
 					{
 						"string" : "2.8"
@@ -191,14 +191,14 @@
 				{
 					"directoryIndex" : 5,
 					"id" : "CGL::@471a8420bb23f6744067",
-					"jsonFile" : "target-CGL-Debug-bcb714481a585be8e768.json",
+					"jsonFile" : "target-CGL-Debug-78e7cad68ef6c48bdba7.json",
 					"name" : "CGL",
 					"projectIndex" : 3
 				},
 				{
 					"directoryIndex" : 6,
 					"id" : "clothsim::@145eef247bfb46b6828c",
-					"jsonFile" : "target-clothsim-Debug-5a0d5da6ecb6406edaa2.json",
+					"jsonFile" : "target-clothsim-Debug-7dce80c31e516359953b.json",
 					"name" : "clothsim",
 					"projectIndex" : 0
 				},
@@ -212,7 +212,7 @@
 				{
 					"directoryIndex" : 3,
 					"id" : "glfw_objects::@05f448bf7d78af58ae8d",
-					"jsonFile" : "target-glfw_objects-Debug-ac39fbb24695b8ecf235.json",
+					"jsonFile" : "target-glfw_objects-Debug-35cfe40184e34b8403bf.json",
 					"name" : "glfw_objects",
 					"projectIndex" : 2
 				},
@@ -226,7 +226,7 @@
 				{
 					"directoryIndex" : 1,
 					"id" : "nanogui-obj::@f32fc89d7586c0a8572c",
-					"jsonFile" : "target-nanogui-obj-Debug-6476b201db54798b1fd5.json",
+					"jsonFile" : "target-nanogui-obj-Debug-7ea4752013a8eed62ca2.json",
 					"name" : "nanogui-obj",
 					"projectIndex" : 1
 				}
@@ -236,8 +236,8 @@
 	"kind" : "codemodel",
 	"paths" : 
 	{
-		"build" : "/Users/jennifer/Desktop/cs184/p4-clothsim/cmake-build-debug",
-		"source" : "/Users/jennifer/Desktop/cs184/p4-clothsim"
+		"build" : "/Users/kaionamartinson/Desktop/cs 184/184-velvet-skirts/cmake-build-debug",
+		"source" : "/Users/kaionamartinson/Desktop/cs 184/184-velvet-skirts"
 	},
 	"version" : 
 	{

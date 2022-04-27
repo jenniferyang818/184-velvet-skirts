@@ -109,7 +109,7 @@ rule CXX_EXECUTABLE_LINKER__clothsim_Debug
 # Rule for re-running cmake.
 
 rule RERUN_CMAKE
-  command = /Applications/CLion.app/Contents/bin/cmake/mac/bin/cmake --regenerate-during-build -S/Users/jennifer/Desktop/cs184/p4-clothsim -B/Users/jennifer/Desktop/cs184/p4-clothsim/cmake-build-debug
+  command = /Applications/CLion.app/Contents/bin/cmake/mac/bin/cmake --regenerate-during-build -S"/Users/kaionamartinson/Desktop/cs 184/184-velvet-skirts" -B"/Users/kaionamartinson/Desktop/cs 184/184-velvet-skirts/cmake-build-debug"
   description = Re-running CMake...
   generator = 1
 

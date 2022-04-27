@@ -1,8 +1,8 @@
-# Install script for directory: /Users/jennifer/Desktop/cs184/p4-clothsim/CGL
+# Install script for directory: /Users/kaionamartinson/Desktop/cs 184/184-velvet-skirts/CGL
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX "/Users/jennifer/Desktop/cs184/p4-clothsim/CGL")
+  set(CMAKE_INSTALL_PREFIX "/Users/kaionamartinson/Desktop/cs 184/184-velvet-skirts/CGL")
 endif()
 string(REGEX REPLACE "/$" "" CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
 
@@ -39,7 +39,7 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
-  include("/Users/jennifer/Desktop/cs184/p4-clothsim/cmake-build-debug/CGL/src/cmake_install.cmake")
+  include("/Users/kaionamartinson/Desktop/cs 184/184-velvet-skirts/cmake-build-debug/CGL/src/cmake_install.cmake")
 
 endif()
 

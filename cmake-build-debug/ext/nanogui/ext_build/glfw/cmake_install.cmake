@@ -1,4 +1,4 @@
-# Install script for directory: /Users/jennifer/Desktop/cs184/p4-clothsim/ext/nanogui/ext/glfw
+# Install script for directory: /Users/kaionamartinson/Desktop/cs 184/184-velvet-skirts/ext/nanogui/ext/glfw
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -39,7 +39,7 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
-  include("/Users/jennifer/Desktop/cs184/p4-clothsim/cmake-build-debug/ext/nanogui/ext_build/glfw/src/cmake_install.cmake")
+  include("/Users/kaionamartinson/Desktop/cs 184/184-velvet-skirts/cmake-build-debug/ext/nanogui/ext_build/glfw/src/cmake_install.cmake")
 
 endif()
 

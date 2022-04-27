@@ -1,17 +1,113 @@
-<html>
+<html xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
 	<head>
-	</head>
-	<body>
-		<p>blah blah blah</p>
-	</body>
-	<script>
-		var links = document.body.getElementsByTagName("a")
-		var a = window.location.href.indexOf(".io")
-		var repo_name = window.location.href.substring(a+3)
-		for(var i = 0; i < links.length; i++){
-			var link = links[i]
-			var actual_name = link.href.substring(link.href.indexOf(".io")+4)
-			link.href = repo_name + actual_name
+	<style>
+		table {
+			font-family: arial, sans-serif;
+			border-collapse: collapse;
+			width: 100%;
 		}
-	</script>
+
+		td, th {
+			border: 1px solid #dddddd;
+			text-align: left;
+			padding: 8px;
+		}
+
+		tr:nth-child(even) {
+			background-color: #dddddd;
+		}
+	</style>
+</head>
+	<h1>Velevet Skirt Milestone Status Report</h1>
+	<h4>Team: Jessica Dong, Kelly Li, Kaiona Martinson, Jennifer Yang</h4>
+	<h2>Reflection of Goals and Future Plans</h2>
+	<a href="https://drive.google.com/file/d/1k5l020jCfC3dKK3pJqp378pjdS26O7fq/view?usp=sharing">Video</a>
+	<br>
+	<a href="https://docs.google.com/presentation/d/1EjSm1pIselqgDfMp7krvb5Cqe6Vt9Y2Rm4EXztnN-ng/edit?usp=sharing">Slides</a>
+
+
+	<ul>
+		<li> Our week two goals were:
+			<ul>
+				<li>Basic velvet rendering </li>
+				<li>Render a skirt shape</li>
+				<li>Potentially rendering wind</li>
+			</ul>
+		</li>
+		<li>A bit behind behind in terms of finalizing each part (velvet, skirt) but we have rendered both successfully
+			and made progress! </li>
+	</ul>
+
+	<h3>Velvet Updates</h3>
+	<img src="./images/latest_velvet_1.png" style="float: left; width: 50%; margin-right: 50%;">
+
+
+	<ul>
+
+		<li> Blinn Phong -
+			<ul>
+				<li>Coefficient changes
+					<ul>
+						<li>Diffuse Coefficient changed to red to make the fabric color red </li>
+						<li>Ambient Coefficient changed to 0 so that the base color is black</li>
+						<li>Specular coefficient changed to a brighter red from white, to look more
+							like velvet and less like latex </li>
+					</ul>
+				</li>
+				<li>Increase density in the GUI to 100 (makes the fabric heavier) - 50</li>
+				<li>Increase k_s for a tighter spring - 20000</li>
+			</ul>
+		</li>
+		<li> Bump Mapping - downloaded a photo of velvet texture to mimic the anisotropic nature of velvet without
+			having to actually render its individual fibers.
+		</li>
+
+		<li> Extra parameters
+			<ul>
+				<li>We used this article: https://manual.keyshot.com/manual/materials/material-types/advanced-material/velvet/
+					for a nice baseline on what values to start each parameter with </li>
+				<li>Sheen -> This dictated the color of our reflection, which we set to a lighter shade of red to
+					resemble how velvet looks under brighter conditions</li>
+				<li>Roughness -> We set our roughness to be pretty high, since we want the light to be spread evenly
+					across the velvet  </li>
+				<li>Backscatter -> backscatter is light that is scattered throughout the whole object. Usually it helps
+					with providing a soft effect on the object </li>
+				<li>Edginess -> edginess is how far the sheen spreads across the surface, we set it pretty high, to show
+					brighter borders on our surface edges (a more drastic fade) </li>
+			</ul>
+		</li>
+
+		<li>unintentionally made satin
+			<ul>
+				<li><img src="./images/unintentional_satin.png" style="float: left; width: 50%; margin-right: 50%;"></li>
+			</ul>
+		</li>
+	</ul>
+	<br>
+
+
+	<h3>Skirt Updates</h3>
+	<img src="./images/skirtstructure.png" style="float: left; width: 50%; margin-right: 50%;">
+
+	<ul>
+		<li>Modeled skirt on Blender</li>
+		<li>Need to import model and update collision code so it integrates with skirt dimensions</li>
+	</ul>
+
+
+	<h3>Moving Forward</h3>
+	<ul>
+		<li> Updated Work Plan
+			<ul>
+				<li>Finalize Both Velvet and Skirts</li>
+				<li>Combine both</li>
+				<li>Rendering wind and other materials</li>
+			</ul>
+		</li>
+	</ul>
+
+	<body>
+
+	</body>
+
 </html>

@@ -79,7 +79,7 @@
 			"compileCommandFragments" : 
 			[
 				{
-					"fragment" : " -std=c++11 -m64 -g -g -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk"
+					"fragment" : " -std=c++11 -m64 -g -g -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk -mmacosx-version-min=10.15"
 				},
 				{
 					"fragment" : "-Wno-deprecated-declarations -Wno-c++11-extensions"
@@ -108,11 +108,11 @@
 			[
 				{
 					"backtrace" : 6,
-					"path" : "/Users/jennifer/Desktop/cs184/p4-clothsim/ext/nanogui/include"
+					"path" : "/Users/kaionamartinson/Desktop/cs 184/184-velvet-skirts/ext/nanogui/include"
 				},
 				{
 					"backtrace" : 7,
-					"path" : "/Users/jennifer/Desktop/cs184/p4-clothsim/CGL/include"
+					"path" : "/Users/kaionamartinson/Desktop/cs 184/184-velvet-skirts/CGL/include"
 				},
 				{
 					"backtrace" : 8,
@@ -120,19 +120,19 @@
 				},
 				{
 					"backtrace" : 8,
-					"path" : "/Users/jennifer/Desktop/cs184/p4-clothsim/ext/nanogui/ext/glad/include"
+					"path" : "/Users/kaionamartinson/Desktop/cs 184/184-velvet-skirts/ext/nanogui/ext/glad/include"
 				},
 				{
 					"backtrace" : 8,
-					"path" : "/Users/jennifer/Desktop/cs184/p4-clothsim/ext/nanogui/ext/glfw/include"
+					"path" : "/Users/kaionamartinson/Desktop/cs 184/184-velvet-skirts/ext/nanogui/ext/glfw/include"
 				},
 				{
 					"backtrace" : 8,
-					"path" : "/Users/jennifer/Desktop/cs184/p4-clothsim/ext/nanogui/ext/nanovg/src"
+					"path" : "/Users/kaionamartinson/Desktop/cs 184/184-velvet-skirts/ext/nanogui/ext/nanovg/src"
 				},
 				{
 					"backtrace" : 8,
-					"path" : "/Users/jennifer/Desktop/cs184/p4-clothsim/ext/nanogui/ext/eigen"
+					"path" : "/Users/kaionamartinson/Desktop/cs 184/184-velvet-skirts/ext/nanogui/ext/eigen"
 				}
 			],
 			"language" : "CXX",
@@ -154,11 +154,11 @@
 	[
 		{
 			"backtrace" : 3,
-			"id" : "nanogui::@f32fc89d7586c0a8572c"
+			"id" : "CGL::@471a8420bb23f6744067"
 		},
 		{
 			"backtrace" : 3,
-			"id" : "CGL::@471a8420bb23f6744067"
+			"id" : "nanogui::@f32fc89d7586c0a8572c"
 		}
 	],
 	"id" : "clothsim::@145eef247bfb46b6828c",
@@ -168,7 +168,7 @@
 		[
 			{
 				"backtrace" : 2,
-				"path" : "/Users/jennifer/Desktop/cs184/p4-clothsim"
+				"path" : "/Users/kaionamartinson/Desktop/cs 184/184-velvet-skirts"
 			}
 		],
 		"prefix" : 
@@ -189,7 +189,7 @@
 				"role" : "flags"
 			},
 			{
-				"fragment" : "-Wl,-rpath,/Users/jennifer/Desktop/cs184/p4-clothsim/cmake-build-debug/ext/nanogui",
+				"fragment" : "-Wl,-rpath,\"/Users/kaionamartinson/Desktop/cs 184/184-velvet-skirts/cmake-build-debug/ext/nanogui\"",
 				"role" : "libraries"
 			},
 			{
