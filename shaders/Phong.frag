@@ -19,14 +19,14 @@ void main() {
   ambient_coeff = 0.1;
   // we pick this
   vec3 ambient_illum;
-  ambient_illum = vec3(1, 1, 1);
+  ambient_illum = vec3(0, 0, 0);
 
   vec4 ambient = vec4(ambient_coeff * ambient_illum, 1);
 
  // DIFFUSE
  // we pick this
  vec4 diffuse_coeff;
- diffuse_coeff = u_color;
+ diffuse_coeff = vec4(0.5, 0, 0, 1);
 
   float distance_squared;
   distance_squared = pow(v_position.x - u_light_pos.x, 2) + pow(v_position.y - u_light_pos.y, 2) + pow(v_position.z - u_light_pos.z, 2);
@@ -40,8 +40,10 @@ void main() {
 
   // SPECULAR
   // we pick this
-  float specular_coeff;
-  specular_coeff = 0.5;
+  //float specular_coeff;
+  //specular_coeff = 0.5;
+  vec4 specular_coeff;
+  specular_coeff = vec4(0.75, 0, 0, 1);
 
   distance_squared = pow(v_position.x - u_light_pos.x, 2) + pow(v_position.y - u_light_pos.y, 2) + pow(v_position.z - u_light_pos.z, 2);
   illum = u_light_intensity / distance_squared;
@@ -51,10 +53,10 @@ void main() {
   vec3 bisector = (l_vector + cam_vector) / length(l_vector + cam_vector);
   //we pick this
   float p;
-  p = 100.0;
+  p = 1/0.15; //100.0;
   max_thing = pow(max(0.0, dot(normalize(v_normal), vec4(normalize(bisector), 1))), p);
   vec4 specular;
-  specular = vec4(specular_coeff * illum * max_thing, 1);
+  specular = specular_coeff * vec4(illum * max_thing, 1);
   
   // (Placeholder code. You will want to replace it.)
   out_color = ambient + diffuse + specular;

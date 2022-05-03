@@ -31,96 +31,101 @@ Cloth::~Cloth() {
 }
 
 void Cloth::buildGrid() {
-  // TODO (Part 1): Build a grid of masses and springs.
-    double width_step = width / num_width_points;
-    double height_step = height / num_height_points;
-    if (orientation == HORIZONTAL) {
-        for (int i = 0; i < num_width_points; i++) {
-            for (int j = 0; j < num_height_points; j++) {
-                PointMass pm = PointMass(Vector3D(j * height_step, 1, i * width_step), false);
-                for (std::vector<int> x_y : pinned) {
-                    if (x_y[0] == j && x_y[1] == i) {
-                        pm = PointMass(Vector3D(j * height_step, 1, i * width_step), true);
-                        break;
-                    }
-                }
-                /*if (pinned.size() > i) {
-                    for (int index : pinned[i]) {
-                        if (index == 1) {
-                            pm = PointMass(Vector3D(i, 1, j), true);
-                            break;
-                        }
-                    }
-                    
-                }*/
-                
-                //if (std::find(pinned[i].begin(), pinned[i].end(), 1) != pinned[i].end()) {
-                //    pm = PointMass(Vector3D(i, 1, j), true);
-                //}
-                point_masses.emplace_back(pm);
+    // let num_width_points and num_height_points be the max skirt height and width
+  // make extra datastructure to build springs
+    double height_offset = height / num_height_points;
+    double curr_height = height;
+
+    double max_radius = width;
+    double min_radius = width / 4;
+    double curr_radius = min_radius;
+    double radius_offset = (max_radius - min_radius) / num_width_points;
+
+    double theta_offset = 2 * PI / (num_width_points);
+    // gives the skirt more of a curve instead of a cone shape
+    double taper_ratio = 0.995;
+    // ratio where we stop pinning the "pleats", allows rest of skirt to flow
+    double stop_pinning = 0.3;
+    //  double beta_offset = 2 * PI / ((num_width_points - 1) / 2);
+
+      // pleat variables
+    //  double m = 0.1;
+    //  double beta = 2 * PI;
+
+
+    for (int i = 0; i < num_height_points; i++) {
+        double theta = 0;
+        double gamma = 0;
+        for (int j = 0; j < num_width_points; j++) {
+            bool is_pinned = false;
+            if (i < 2 || (j % 5 == 0 && i < num_height_points * stop_pinning)) {
+                is_pinned = true;
             }
+
+            double x = curr_radius * cos(theta);
+            double y = curr_height;
+            double z = curr_radius * sin(theta);
+
+            Vector3D pos = Vector3D(x, y, z);
+            PointMass mass = PointMass(pos, is_pinned);
+            point_masses.emplace_back(mass);
+
+            theta += theta_offset;
         }
-    }
-    else {
-        for (int i = 0; i < num_width_points; i++) {
-            for (int j = 0; j < num_height_points; j++) {
-                float rand_val = float(rand()) / float((RAND_MAX)) * (1/500.0) - (1/1000.0);
-                PointMass pm = PointMass(Vector3D(j * height_step, i * width_step, rand_val), false);
-                for (std::vector<int> x_y : pinned) {
-                    if (x_y[0] == j && x_y[1] == i) {
-                        pm = PointMass(Vector3D(j * height_step, i * width_step, rand_val), true);
-                        break;
-                    }
-                }
-                /*if (pinned.size() > i) {
-                    for (int index : pinned[i]) {
-                        if (index == j) {
-                            pm = PointMass(Vector3D(i, j, rand_val), true);
-                            break;
-                        }
-                    }
-                }*/
-                //if (std::find(pinned[i].begin(), pinned[i].end(), j) != pinned[i].end()) {
-                //    pm = PointMass(Vector3D(i, j, rand_val), true);
-                //}
-                point_masses.emplace_back(pm);
-            }
+        if (i >= 2) {
+            curr_radius += radius_offset;
+            radius_offset *= taper_ratio;
         }
+        curr_height -= height_offset;
     }
-    for (int i = 0; i < num_width_points; i++) {
-        for (int j = 0; j < num_height_points; j++) {
-            PointMass *curr_pm = &point_masses[i * num_height_points + j];
+
+    //  bezierCurve(0.25);
+
+    //  springs.clear();
+    for (int i = 0; i < num_height_points; i++) {
+        for (int j = 0; j < num_width_points; j++) {
+            int index = (i * num_width_points) + j;
+            // structural -> left
             if (j > 0) {
-                PointMass *left_pm = &point_masses[i * num_height_points + j - 1];
-                Spring structural = Spring(curr_pm, left_pm, STRUCTURAL);
-                springs.emplace_back(structural);
+                Spring spring = Spring(&point_masses[index - 1], &point_masses[index], STRUCTURAL);
+                springs.emplace_back(spring);
             }
+            else {
+                int last = (i * num_width_points) + (num_width_points - 1);
+                Spring spring = Spring(&point_masses[last], &point_masses[index], STRUCTURAL);
+                springs.emplace_back(spring);
+            }
+            // structural -> above
             if (i > 0) {
-                PointMass *up_pm = &point_masses[(i - 1) * num_height_points + j];
-                Spring structural = Spring(curr_pm, up_pm, STRUCTURAL);
-                springs.emplace_back(structural);
+                Spring spring = Spring(&point_masses[index - num_width_points], &point_masses[index], STRUCTURAL);
+                springs.emplace_back(spring);
             }
+
+            // shearing -> diagonal upper right
+            if (i > 0 && j < num_width_points - 1) {
+                int last = ((i - 1) * num_width_points) + (j + 1);
+                Spring spring = Spring(&point_masses[last], &point_masses[index], SHEARING);
+                springs.emplace_back(spring);
+            }
+            else if (i > 0 && j == num_width_points - 1) {
+                int last = ((i - 1) * num_width_points);
+                Spring spring = Spring(&point_masses[last], &point_masses[index], SHEARING);
+                springs.emplace_back(spring);
+            }
+
+            // shearing -> diagonal upper left
             if (i > 0 && j > 0) {
-                PointMass *up_left_pm = &point_masses[(i - 1) * num_height_points + j - 1];
-                Spring shearing = Spring(curr_pm, up_left_pm, SHEARING);
-                springs.emplace_back(shearing);
+                int last = ((i - 1) * num_width_points) + (j - 1);
+                Spring spring = Spring(&point_masses[last], &point_masses[index], SHEARING);
+                springs.emplace_back(spring);
             }
-            if (i > 0 && j < num_height_points - 1) {
-                PointMass *up_right_pm = &point_masses[(i - 1) * num_height_points + j + 1];
-                Spring shearing = Spring(curr_pm, up_right_pm, SHEARING);
-                springs.emplace_back(shearing);
-            }
-            if (j > 1) {
-                PointMass *two_left_pm = &point_masses[i * num_height_points + j - 2];
-                Spring bending = Spring(curr_pm, two_left_pm, BENDING);
-                springs.emplace_back(bending);
-            }
-            if (i > 1) {
-                PointMass *two_up_pm = &point_masses[(i - 2) * num_height_points + j];
-                Spring bending = Spring(curr_pm, two_up_pm, BENDING);
-                springs.emplace_back(bending);
+            else if (i > 0 && j == 0) {
+                int last = ((i - 1) * num_width_points) + (num_width_points - 1);
+                Spring spring = Spring(&point_masses[last], &point_masses[index], SHEARING);
+                springs.emplace_back(spring);
             }
         }
+
     }
 }
 
@@ -346,10 +351,18 @@ void Cloth::buildClothMesh() {
       float v_max = y + 1;
       v_max /= num_height_points - 1;
       
-      PointMass *pm_A = pm                       ;
-      PointMass *pm_B = pm                    + 1;
+      PointMass *pm_A = pm;
+      PointMass* pm_B = pm + 1;
+      /* & point_masses[y * num_width_points];
+      if (x < num_width_points - 1) {
+        pm_B = ;
+      }*/
       PointMass *pm_C = pm + num_width_points    ;
       PointMass *pm_D = pm + num_width_points + 1;
+      /*&point_masses[(y + 1) * num_width_points];
+      if (x < num_width_points - 1) {
+          pm_D = 
+      }*/
       
       Vector3D uv_A = Vector3D(u_min, v_min, 0);
       Vector3D uv_B = Vector3D(u_max, v_min, 0);
