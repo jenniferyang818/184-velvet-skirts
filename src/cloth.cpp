@@ -42,6 +42,10 @@ void Cloth::buildGrid() {
     double radius_offset = (max_radius - min_radius) / num_width_points;
 
     double theta_offset = 2 * PI / (num_width_points);
+    // gives the skirt more of a curve instead of a cone shape
+    double taper_ratio = 0.995;
+    // ratio where we stop pinning the "pleats", allows rest of skirt to flow
+    double stop_pinning = 0.3;
     //  double beta_offset = 2 * PI / ((num_width_points - 1) / 2);
 
       // pleat variables
@@ -54,7 +58,7 @@ void Cloth::buildGrid() {
         double gamma = 0;
         for (int j = 0; j < num_width_points; j++) {
             bool is_pinned = false;
-            if (i < 2 || j % 5 == 0) {
+            if (i < 2 || (j % 5 == 0 && i < num_height_points * stop_pinning)) {
                 is_pinned = true;
             }
 
@@ -69,7 +73,8 @@ void Cloth::buildGrid() {
             theta += theta_offset;
         }
         if (i >= 2) {
-            curr_radius += radius_offset * exp(1/i);
+            curr_radius += radius_offset;
+            radius_offset *= taper_ratio;
         }
         curr_height -= height_offset;
     }
