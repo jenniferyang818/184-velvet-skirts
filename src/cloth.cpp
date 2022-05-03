@@ -31,196 +31,221 @@ Cloth::~Cloth() {
 }
 
 void Cloth::buildGrid() {
-  // TODO (Part 1): Build a grid of masses and springs.
-    double width_step = width / num_width_points;
-    double height_step = height / num_height_points;
-    if (orientation == HORIZONTAL) {
-        for (int i = 0; i < num_width_points; i++) {
-            for (int j = 0; j < num_height_points; j++) {
-                PointMass pm = PointMass(Vector3D(j * height_step, 1, i * width_step), false);
-                for (std::vector<int> x_y : pinned) {
-                    if (x_y[0] == j && x_y[1] == i) {
-                        pm = PointMass(Vector3D(j * height_step, 1, i * width_step), true);
-                        break;
-                    }
-                }
-                /*if (pinned.size() > i) {
-                    for (int index : pinned[i]) {
-                        if (index == 1) {
-                            pm = PointMass(Vector3D(i, 1, j), true);
-                            break;
-                        }
-                    }
-                    
-                }*/
-                
-                //if (std::find(pinned[i].begin(), pinned[i].end(), 1) != pinned[i].end()) {
-                //    pm = PointMass(Vector3D(i, 1, j), true);
-                //}
-                point_masses.emplace_back(pm);
-            }
-        }
+  // let num_width_points and num_height_points be the max skirt height and width
+  // make extra datastructure to build springs
+  double height_offset = height / num_height_points;
+  double curr_height = height;
+  
+  double max_radius = width;
+  double min_radius = width / 4;
+  double curr_radius = min_radius;
+  double radius_offset = (max_radius - min_radius) / num_width_points;
+  
+  double theta_offset = 2 * PI / (num_width_points - 1);
+//  double beta_offset = 2 * PI / ((num_width_points - 1) / 2);
+  
+  // pleat variables
+//  double m = 0.1;
+//  double beta = 2 * PI;
+  
+  
+  for (int i = 0; i < num_height_points; i++) {
+    double theta = 0;
+    double gamma = 0;
+    for (int j = 0; j < num_width_points; j++) {
+      bool is_pinned = false;
+      if (i < 2 || j % 7 == 0) {
+        is_pinned = true;
+      }
+      
+      double x = curr_radius * cos(theta);
+      double y = curr_height;
+      double z = curr_radius * sin(theta);
+
+      Vector3D pos = Vector3D(x, y, z);
+      PointMass mass = PointMass(pos, is_pinned);
+      point_masses.emplace_back(mass);
+      
+      theta += theta_offset;
     }
-    else {
-        for (int i = 0; i < num_width_points; i++) {
-            for (int j = 0; j < num_height_points; j++) {
-                float rand_val = float(rand()) / float((RAND_MAX)) * (1/500.0) - (1/1000.0);
-                PointMass pm = PointMass(Vector3D(j * height_step, i * width_step, rand_val), false);
-                for (std::vector<int> x_y : pinned) {
-                    if (x_y[0] == j && x_y[1] == i) {
-                        pm = PointMass(Vector3D(j * height_step, i * width_step, rand_val), true);
-                        break;
-                    }
-                }
-                /*if (pinned.size() > i) {
-                    for (int index : pinned[i]) {
-                        if (index == j) {
-                            pm = PointMass(Vector3D(i, j, rand_val), true);
-                            break;
-                        }
-                    }
-                }*/
-                //if (std::find(pinned[i].begin(), pinned[i].end(), j) != pinned[i].end()) {
-                //    pm = PointMass(Vector3D(i, j, rand_val), true);
-                //}
-                point_masses.emplace_back(pm);
-            }
-        }
+    if (i >= 2) {
+      curr_radius += radius_offset;
     }
-    for (int i = 0; i < num_width_points; i++) {
-        for (int j = 0; j < num_height_points; j++) {
-            PointMass *curr_pm = &point_masses[i * num_height_points + j];
-            if (j > 0) {
-                PointMass *left_pm = &point_masses[i * num_height_points + j - 1];
-                Spring structural = Spring(curr_pm, left_pm, STRUCTURAL);
-                springs.emplace_back(structural);
-            }
-            if (i > 0) {
-                PointMass *up_pm = &point_masses[(i - 1) * num_height_points + j];
-                Spring structural = Spring(curr_pm, up_pm, STRUCTURAL);
-                springs.emplace_back(structural);
-            }
-            if (i > 0 && j > 0) {
-                PointMass *up_left_pm = &point_masses[(i - 1) * num_height_points + j - 1];
-                Spring shearing = Spring(curr_pm, up_left_pm, SHEARING);
-                springs.emplace_back(shearing);
-            }
-            if (i > 0 && j < num_height_points - 1) {
-                PointMass *up_right_pm = &point_masses[(i - 1) * num_height_points + j + 1];
-                Spring shearing = Spring(curr_pm, up_right_pm, SHEARING);
-                springs.emplace_back(shearing);
-            }
-            if (j > 1) {
-                PointMass *two_left_pm = &point_masses[i * num_height_points + j - 2];
-                Spring bending = Spring(curr_pm, two_left_pm, BENDING);
-                springs.emplace_back(bending);
-            }
-            if (i > 1) {
-                PointMass *two_up_pm = &point_masses[(i - 2) * num_height_points + j];
-                Spring bending = Spring(curr_pm, two_up_pm, BENDING);
-                springs.emplace_back(bending);
-            }
-        }
+    curr_height -= height_offset;
+  }
+  
+//  bezierCurve(0.25);
+  
+//  springs.clear();
+  for (int i = 0; i < num_height_points; i++) {
+    for (int j = 0; j < num_width_points; j++) {
+      int index = (i * num_width_points) + j;
+      // structural -> left
+      if (j > 0) {
+        Spring spring = Spring(&point_masses[index - 1], &point_masses[index], STRUCTURAL);
+        springs.emplace_back(spring);
+      } else {
+        int last = (i * num_width_points) + (num_width_points - 1);
+        Spring spring = Spring(&point_masses[last], &point_masses[index], STRUCTURAL);
+        springs.emplace_back(spring);
+      }
+      // structural -> above
+      if (i > 0) {
+        Spring spring = Spring(&point_masses[i - 1], &point_masses[i], STRUCTURAL);
+        springs.emplace_back(spring);
+      }
+      
+      // shearing -> diagonal upper right
+      if (i > 0 && j < num_width_points - 1) {
+        int last = ((i - 1) * num_width_points) + (j + 1);
+        Spring spring = Spring(&point_masses[last], &point_masses[index], SHEARING);
+        springs.emplace_back(spring);
+      } else if (i > 0 && j == num_width_points - 1) {
+        int last = ((i - 1) * num_width_points);
+        Spring spring = Spring(&point_masses[last], &point_masses[index], SHEARING);
+        springs.emplace_back(spring);
+      }
+      
+      // shearing -> diagonal upper left
+      if (i > 0 && j > 0) {
+        int last = ((i - 1) * num_width_points) + (j - 1);
+        Spring spring = Spring(&point_masses[last], &point_masses[index], SHEARING);
+        springs.emplace_back(spring);
+      } else if (i > 0 && j == 0) {
+        int last = ((i - 1) * num_width_points) + (num_width_points - 1);
+        Spring spring = Spring(&point_masses[last], &point_masses[index], SHEARING);
+        springs.emplace_back(spring);
+      }
     }
+    
+  }
 }
+
+//void Cloth::bezierCurve(double t) {
+//  std::vector<Vector3D> new_pos = std::vector<Vector3D>();
+//  new_pos.reserve(point_masses.size() - 6);
+//  for (int i = 0; i < num_width_points; i++) {
+//    // start after 2 -> after hemming
+//    // start after another 4 bc of control points
+//    // j = 6
+//    for (int j = 6; j < num_height_points; j++) {
+//      int index = (j * num_width_points) + i;
+//      int p0 = ((j - 4) * num_width_points) + i;
+//      int p1 = ((j - 3) * num_width_points) + i;
+//      int p2 = ((j - 2) * num_width_points) + i;
+//      int p3 = ((j - 1) * num_width_points) + i;
+//      Vector3D pos = pow((1 - t), 3) * point_masses[p0].position;
+//      pos += 3 * t * pow(1 - t, 2) * point_masses[p1].position;
+//      pos += 3 * pow(t, 2) * (1 - t) * point_masses[p2].position;
+//      pos += pow(t, 3) * point_masses[p3].position;
+//      new_pos[((j - 6) * num_width_points) + i] = pos;
+//    }
+//  }
+//  for (int i = 0; i < num_width_points; i++) {
+//    for (int j = 6; j < num_height_points; j++) {
+//      int index = (j * num_width_points) + i;
+//      point_masses[index].position = new_pos[((j - 6) * num_width_points) + i];
+//    }
+//  }
+//}
+
+void Cloth::bezierCurve(double t) {
+//  std::vector<Vector3D> new_pos = std::vector<Vector3D>();
+//  new_pos.reserve(point_masses.size() - 6);
+  for (int i = 0; i < num_width_points; i++) {
+    // start after 2 -> after hemming
+    // start after another 4 bc of control points
+    // j = 6
+    for (int j = 6; j < num_height_points; j++) {
+      int index = (j * num_width_points) + i;
+      int p0 = ((j - 4) * num_width_points) + i;
+      int p1 = ((j - 3) * num_width_points) + i;
+      int p2 = ((j - 2) * num_width_points) + i;
+      int p3 = ((j - 1) * num_width_points) + i;
+      Vector3D pos = pow((1 - t), 3) * point_masses[p0].position;
+      pos += 3 * t * pow(1 - t, 2) * point_masses[p1].position;
+      pos += 3 * pow(t, 2) * (1 - t) * point_masses[p2].position;
+      pos += pow(t, 3) * point_masses[p3].position;
+    }
+  }
+}
+
 
 void Cloth::simulate(double frames_per_sec, double simulation_steps, ClothParameters *cp,
                      vector<Vector3D> external_accelerations,
                      vector<CollisionObject *> *collision_objects) {
-  double mass = width * height * cp->density / num_width_points / num_height_points;
-  double delta_t = 1.0f / frames_per_sec / simulation_steps;
+    double mass = width * height * cp->density / num_width_points / num_height_points;
+    double delta_t = 1.0f / frames_per_sec / simulation_steps;
 
-  // TODO (Part 2): Compute total force acting on each point mass.
-  Vector3D total_force;
-  for (int i = 0; i < external_accelerations.size(); i++) {
-      total_force += mass * external_accelerations[i];
-  }
-  for (int i = 0; i < num_width_points; i++) {
-      for (int j = 0; j < num_height_points; j++) {
-          PointMass* pm = &point_masses[i * num_height_points + j];
-          pm->forces = total_force;
+    // TODO (Part 2): Compute total force acting on each point mass.
+    Vector3D ext_force = Vector3D();
+    for (int i = 0; i < external_accelerations.size(); i++) {
+      ext_force += (mass * external_accelerations[i]);
+    }
+    for (int j = 0; j < point_masses.size(); j++) {
+      point_masses[j].forces = ext_force;
+    }
+
+    for (int i = 0; i < springs.size(); i++) {
+      PointMass a = *springs[i].pm_a;
+      PointMass b = *springs[i].pm_b;
+      if ((cp->enable_structural_constraints && springs[i].spring_type == STRUCTURAL) ||
+          (cp->enable_shearing_constraints && springs[i].spring_type == SHEARING) ||
+          (cp->enable_bending_constraints && springs[i].spring_type == BENDING)) {
+        Vector3D delta_pos = b.position - a.position;
+        double mag = delta_pos.norm();
+        double spring_const = cp->ks;
+        if (springs[i].spring_type == BENDING) {
+//          spring_const *= 1 - 0.2;
+          spring_const *= 0.2;
+        }
+
+        double fs = spring_const * (mag - springs[i].rest_length);
+        Vector3D f_ab =  fs * delta_pos.unit();
+        springs[i].pm_a->forces += f_ab;
+        springs[i].pm_b->forces -= f_ab;
       }
-  }
-  for (int i = 0; i < springs.size(); i++) {
-      Spring* spring = &springs[i];
-      if (cp->enable_structural_constraints && spring->spring_type == STRUCTURAL) {
-          Vector3D a_b_diff = spring->pm_a->position - spring->pm_b->position;
-          double f_s = cp->ks * (a_b_diff.norm() - spring->rest_length);
-          Vector3D force_vector = f_s * (spring->pm_b->position - spring->pm_a->position).unit();
-          spring->pm_a->forces += force_vector;
-          spring->pm_b->forces -= force_vector;
-      }
-      if (cp->enable_shearing_constraints && spring->spring_type == SHEARING) {
-          Vector3D a_b_diff = spring->pm_a->position - spring->pm_b->position;
-          double f_s = cp->ks * (a_b_diff.norm() - spring->rest_length);
-          Vector3D force_vector = f_s * (spring->pm_b->position - spring->pm_a->position).unit();
-          spring->pm_a->forces += force_vector;
-          spring->pm_b->forces -= force_vector;
-      }
-      if (cp->enable_bending_constraints && spring->spring_type == BENDING) {
-          Vector3D a_b_diff = spring->pm_a->position - spring->pm_b->position;
-          double f_s = cp->ks * 0.2 * (a_b_diff.norm() - spring->rest_length);
-          Vector3D force_vector = f_s * (spring->pm_b->position - spring->pm_a->position).unit();
-          spring->pm_a->forces += force_vector;
-          spring->pm_b->forces -= force_vector;
-      }
-  }
-  
-  // TODO (Part 2): Use Verlet integration to compute new point mass positions
-  for (int i = 0; i < num_width_points; i++) {
-      for (int j = 0; j < num_height_points; j++) {
-          PointMass* pm = &point_masses[i * num_height_points + j];
-          if (!(pm->pinned)) {
-              Vector3D new_pos = pm->position + (1 - cp->damping / 100.0) * (pm->position - pm->last_position) + (pm->forces / mass) * pow(delta_t, 2);
-              pm->last_position = pm->position;
-              pm->position = new_pos;
-          }
-      }
+    }
+
+  // TODO (Part 2.2): Use Verlet integration to compute new point mass positions
+  for (int i = 0; i < point_masses.size(); i++) {
+    if (!point_masses[i].pinned) {
+      Vector3D new_pos = point_masses[i].position + (1 - (cp->damping / 100.0)) * (point_masses[i].position - point_masses[i].last_position) + (point_masses[i].forces / mass) * pow(delta_t, 2);
+      point_masses[i].last_position = point_masses[i].position;
+      point_masses[i].position = new_pos;
+    }
   }
 
-
-
-  // TODO (Part 4): Handle self-collisions.
   build_spatial_map();
-    for (int i = 0; i < num_width_points; i++) {
-        for (int j = 0; j < num_height_points; j++) {
-            PointMass *curr_pm = &point_masses[i * num_height_points + j];
-            this->self_collide(*curr_pm, simulation_steps);
-            point_masses[i * num_height_points + j] = *curr_pm;
+//   TODO (Part 4): Handle self-collisions.
+  for (int j = 0; j < point_masses.size(); j++) {
+    self_collide(point_masses[j], simulation_steps);
+    for (CollisionObject *c : *collision_objects) {
+      c->collide(point_masses[j]);
+    }
+  }
+
+  // TODO (Part 3): Handle collisions with other primitives.
+
+  // TODO (Part 2.3): Constrain the changes to be such that the spring does not change
+    for (Spring s : this->springs) {
+        PointMass a = *s.pm_a;
+        PointMass b = *s.pm_b;
+        double length = (b.position - a.position).norm();
+        Vector3D direction_vector = (b.position - a.position).unit();
+
+        if (length > s.rest_length * 1.1) {
+            double change_distance = (s.rest_length / length * 1.1);
+            if (!a.pinned && !b.pinned) {
+                a.position -=  direction_vector * change_distance * 0.05;
+                b.position += direction_vector * change_distance * 0.05;
+            } else if (!a.pinned && b.pinned) {
+                a.position -= direction_vector * change_distance;
+            } else if (!b.pinned && a.pinned) {
+                b.position += direction_vector * change_distance;
+            }
         }
     }
-  // TODO (Part 3): Handle collisions with other primitives.
-  for (int i = 0; i < num_width_points; i++) {
-      for (int j = 0; j < num_height_points; j++) {
-          PointMass *curr_pm = &point_masses[i * num_height_points + j];
-          for (CollisionObject *collide : *collision_objects) {
-                collide->collide(*curr_pm);
-          }
-      }
-  }
-
-  // TODO (Part 2): Constrain the changes to be such that the spring does not change
-  // in length more than 10% per timestep [Provot 1995].
-  for (int i = 0; i < springs.size(); i++) {
-      Spring *s = &springs[i];
-      Vector3D a_b_diff = s->pm_a->position - s->pm_b->position;
-      double spring_length = a_b_diff.norm();
-      if (spring_length > 1.1 * s->rest_length) {
-          double remove_length = spring_length - 1.1 * s->rest_length;
-//          double max_length = 1.1 * s->rest_length;
-          if (!s->pm_a->pinned && !s->pm_b->pinned) {
-              s->pm_a->position -= a_b_diff.unit() * remove_length / 2;
-              s->pm_b->position += a_b_diff.unit() * remove_length / 2;
-          }
-          else if (!s->pm_a->pinned) {
-              s->pm_a->position -= a_b_diff.unit() * remove_length;
-          }
-          else if (!s->pm_b->pinned) {
-              s->pm_b->position += a_b_diff.unit() * remove_length;
-          }
-      }
-  }
-
 }
 
 void Cloth::build_spatial_map() {
@@ -230,73 +255,58 @@ void Cloth::build_spatial_map() {
   map.clear();
 
   // TODO (Part 4): Build a spatial map out of all of the point masses.
-  for (PointMass &pm : this->point_masses) {
-      float hash = hash_position(pm.position);
-      if (map.find(hash) == map.end()) {
-          map[hash] = new vector<PointMass *>;
-      }
-
-//          std::vector<PointMass *> curr_list = std::vector<PointMass *>();
-//          curr_list.emplace_back(&pm);
-//          pair<float, vector<PointMass *> *> insert_pair = {hash, &curr_list};
-//          map.insert(insert_pair);
-//      } else {
-//          std::vector<PointMass *> *curr_list = map[hash];
-//          curr_list->emplace_back(&pm);
-//          map[hash] = curr_list;
-      map[hash]->emplace_back(&pm);
+  for (int i = 0; i < point_masses.size(); i ++) {
+    float hash = hash_position(point_masses[i].position);
+    if (map.count(hash)) {
+      map[hash]->push_back(&point_masses[i]);
+    } else {
+      vector<PointMass*>* bucket = new vector<PointMass*>({&point_masses[i]});
+      map[hash] = bucket;
+    }
   }
 }
 
+
 void Cloth::self_collide(PointMass &pm, double simulation_steps) {
-  // TODO (Part 4): Handle self-collision for a given point mass.
-  //build_spatial_map();
-    float curr_hash = hash_position(pm.position);
-    vector<PointMass *> *candidates = map[curr_hash];
-    Vector3D sum_correction;
+    // TODO (Part 4): Handle self-collision for a given point mass.
+  float hash = hash_position(pm.position);
+  if (map.count(hash)) {
+//    cout << ":)";
+    vector<PointMass*>* bucket = map[hash];
+    // get candidates for collision
+    Vector3D correction_vector = Vector3D();
     int count = 0;
-    for (int i = 0; i < candidates->size(); i++) {
-        PointMass *candidate = (*candidates)[i];
-        if (candidate != &pm) {
-            if ((candidate->position - pm.position).norm() < 2.0 * thickness) {
-                Vector3D correction_vector = ((pm.position - candidate->position)).unit() * (2.0 * thickness - (candidate->position - pm.position).norm());
-                sum_correction += correction_vector;
-                count++;
-            }
-        }
+//    cout << "no";
+    for(PointMass *p : *bucket) {
+//      cout << "yes";
+      // determine if pm and candidate are w/in 2*thickness apart
+      Vector3D dist = pm.position - p->position;
+      bool eq = (p == &pm);
+      if (!eq && dist.norm() <= 2 * thickness) {
+        // if so, compute correction vector
+        count += 1;
+//        pm.position -= p->position - pm.position;
+        correction_vector += dist.unit() * (2 * thickness - dist.norm());
+      }
     }
+    // final correction vector = avg(correction vectors, scaled down by simu steps)
     if (count > 0) {
-        sum_correction /= (double)count;
-        sum_correction /= simulation_steps;
+      pm.position += correction_vector / count / simulation_steps;
     }
-    pm.position = sum_correction + pm.position;
+  }
 }
 
 float Cloth::hash_position(Vector3D pos) {
   // TODO (Part 4): Hash a 3D position into a unique float identifier that represents membership in some 3D box volume.
-    double w = 3.0 * width / num_width_points;
-    double h = 3.0 * height / num_height_points;
-    double t = max(w, h);
-    Vector3D hashed_coords;
-    if (orientation == HORIZONTAL) {
-        int hash_to_z = int(pos.z / w);
-        int hash_to_x = int(pos.x / h);
-        int hash_to_y = int(pos.y / t);
-        hashed_coords = Vector3D(hash_to_x, hash_to_y, hash_to_z);
-    }
-    else {
-        int hash_to_z = int(pos.z / t);
-        int hash_to_x = int(pos.x / h);
-        int hash_to_y = int(pos.y / w);
-        hashed_coords = Vector3D(hash_to_x, hash_to_y, hash_to_z);
-    }
-//    int hash_to_x = int(pos.x / w);
-//    int hash_to_y = int(pos.y / h);
-//    int hash_to_z = int(pos.z / t);
-//    hashed_coords = Vector3D(hash_to_x, hash_to_y, hash_to_z);
-    int star = max(num_width_points, num_height_points);
-    int hash = (((hashed_coords.x * star) + hashed_coords.y) * star + hashed_coords.z);
-    return float(hash);
+  float w = 3 * width / num_width_points;
+  float h = 3 * height / num_height_points;
+  float t = max(w,h);
+  int wi = floor(pos.x / w);
+  int hi = floor(pos.y / h);
+  int ti = floor(pos.z / t);
+  
+  float unique_pos = float(ti * (w * h)) + ((hi * w) + wi);
+  return unique_pos;
 }
 
 ///////////////////////////////////////////////////////
@@ -358,9 +368,9 @@ void Cloth::buildClothMesh() {
       
       
       // Both triangles defined by vertices in counter-clockwise orientation
-      triangles.push_back(new Triangle(pm_A, pm_C, pm_B, 
+      triangles.push_back(new Triangle(pm_A, pm_C, pm_B,
                                        uv_A, uv_C, uv_B));
-      triangles.push_back(new Triangle(pm_B, pm_C, pm_D, 
+      triangles.push_back(new Triangle(pm_B, pm_C, pm_D,
                                        uv_B, uv_C, uv_D));
     }
   }

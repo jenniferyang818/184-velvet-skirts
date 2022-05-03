@@ -29,7 +29,7 @@ struct ClothParameters {
   ~ClothParameters() {}
 
   // Global simulation parameters
-
+C
   bool enable_structural_constraints;
   bool enable_shearing_constraints;
   bool enable_bending_constraints;
@@ -48,6 +48,7 @@ struct Cloth {
   ~Cloth();
 
   void buildGrid();
+  void bezierCurve(double t);
 
   void simulate(double frames_per_sec, double simulation_steps, ClothParameters *cp,
                 vector<Vector3D> external_accelerations,
