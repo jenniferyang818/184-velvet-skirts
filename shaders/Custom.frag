@@ -51,7 +51,7 @@ void main() {
   b = cross(v_normal.xyz, v_tangent.xyz);
   tbn[0] = normalize(v_tangent.xyz);
   tbn[1] = normalize(b);
-  tbn[2] = normalize(v_normal.xyz);
+  tbn[2] = -1 * normalize(v_normal.xyz);
   vec2 du_arg = vec2(v_uv[0] + (1 / u_texture_3_size[0]), v_uv[1]);
   float du = (h(du_arg) - h(v_uv)) * u_height_scaling * u_normal_scaling;
   vec2 dv_arg = vec2(v_uv[0], v_uv[1] + (1 / u_texture_3_size[1]));
