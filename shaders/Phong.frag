@@ -34,7 +34,7 @@ void main() {
   illum = u_light_intensity / distance_squared;
   vec3 difference = vec3(u_light_pos.x - v_position.x, u_light_pos.y - v_position.y, u_light_pos.z - v_position.z);
   float max_thing;
-  max_thing = max(0.0, dot(normalize(v_normal), vec4(normalize(difference), 1)));
+  max_thing = max(0.0, dot(-1 * normalize(v_normal), vec4(normalize(difference), 1)));
   vec4 diffuse;
   diffuse = diffuse_coeff * vec4(illum * max_thing, 1);
 
@@ -54,7 +54,7 @@ void main() {
   //we pick this
   float p;
   p = 1/0.15; //100.0;
-  max_thing = pow(max(0.0, dot(normalize(v_normal), vec4(normalize(bisector), 1))), p);
+  max_thing = pow(max(0.0, dot(-1 * normalize(v_normal), vec4(normalize(bisector), 1))), p);
   vec4 specular;
   specular = specular_coeff * vec4(illum * max_thing, 1);
   
