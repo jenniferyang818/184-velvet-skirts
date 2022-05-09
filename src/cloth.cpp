@@ -325,7 +325,7 @@ void Cloth::buildClothMesh() {
 
   // Create vector of triangles
   for (int y = 0; y < num_height_points - 1; y++) {
-    for (int x = 0; x < num_width_points - 1; x++) {
+    for (int x = 0; x < num_width_points; x++) {
       PointMass *pm = &point_masses[y * num_width_points + x];
       // Get neighboring point masses:
       /*                      *
@@ -343,26 +343,26 @@ void Cloth::buildClothMesh() {
        */
       
       float u_min = x;
-      u_min /= num_width_points - 1;
+      u_min /= num_width_points;
       float u_max = x + 1;
-      u_max /= num_width_points - 1;
+      u_max /= num_width_points;
       float v_min = y;
-      v_min /= num_height_points - 1;
+      v_min /= num_height_points;
       float v_max = y + 1;
-      v_max /= num_height_points - 1;
+      v_max /= num_height_points;
       
       PointMass *pm_A = pm;
-      PointMass* pm_B = pm + 1;
-      /* & point_masses[y * num_width_points];
+      //PointMass* pm_B = pm + 1;
+      PointMass* pm_B = pm - x;
       if (x < num_width_points - 1) {
-        pm_B = ;
-      }*/
+        pm_B = pm + 1;
+      }
       PointMass *pm_C = pm + num_width_points    ;
-      PointMass *pm_D = pm + num_width_points + 1;
-      /*&point_masses[(y + 1) * num_width_points];
+      //PointMass *pm_D = pm + num_width_points + 1;
+      PointMass *pm_D = pm - x + num_width_points;
       if (x < num_width_points - 1) {
-          pm_D = 
-      }*/
+          pm_D = pm + num_width_points + 1;
+      }
       
       Vector3D uv_A = Vector3D(u_min, v_min, 0);
       Vector3D uv_B = Vector3D(u_max, v_min, 0);
@@ -422,7 +422,7 @@ void Cloth::buildClothMesh() {
 
   // Convenient variables for math
   int num_height_tris = (num_height_points - 1) * 2;
-  int num_width_tris = (num_width_points - 1) * 2;
+  int num_width_tris = (num_width_points) * 2;
 
   bool topLeft = true;
   for (int i = 0; i < triangles.size(); i++) {
