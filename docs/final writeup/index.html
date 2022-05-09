@@ -52,18 +52,18 @@
         <h3 align="middle">Velvet Fabric </h3>
 
         <p>
-            We start by finding the left-most x-coordinate and the right-most x-coordinate out of our points.
-            Then we find the lowest and highest y-coordinates out of our points.
-            We iterate starting at the left-most x-coordinate to the right-most coordinate, with an inner loop that runs from the lowest y-coordinate to the highest y-coordinate.
-            This effectively creates a rectangle that contains our triangle in it (the bounding box).
-            At each point, we check if the point is in our triangle by using the point-in-triangle test described in the lecture.
-            If a point is in our triangle,we color it in.
+            For the velvet, we referenced Google’s github site for the Filament project,
+            which helped us determine the base color (ambient coefficient) to be black, 
+            as well as the relation between the diffuse color and sheen color (specular).
+            <br />
+            We modified the existing blinn-phong coefficients to render a more realistic velvet. We changed the diffuse coefficient to a red color to make our base cloth red, the ambient coefficient to a black color to make the shadows darker, and the specular coefficient to a brighter red (instead of white) to make the fabric look less like latex / metal.
+            We also increased the spring constant and density of the fabric in the clothSim gui to make our fabric heavier, as well as adding bump mapping with an image of a red velvet from Google.
+            We referenced a KeyShot article that described different features of velvet like sheen, roughness, backscatter, and edginess to ballpark values that would make our velvet look more realistic.
+
         </p>
 
         <p>
-            Our algorithm is no worse than one that checks each sample within the bounding box of the triangle because the loops in our algorithm iterate from the smallest to largest triangle point x values,
-            giand from the smallest to largest triangle point y values. These iterations thus cover all the points within the triangle’s bounding box.
-            The calculations done in the nested loop in our algorithm are to check the sampled point with the point-in-triangle test.
+            
         </p>
 
         <div align="middle">
