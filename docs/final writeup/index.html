@@ -1,308 +1,184 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-<head>
-<style>
-  body {
-    padding: 100px;
-    width: 1000px;
-    margin: auto;
-    text-align: left;
-    font-weight: 300;
-    font-family: 'Open Sans', sans-serif;
-    color: #121212;
-  }
-  h1, h2, h3, h4 {
-    font-family: 'Source Sans Pro', sans-serif;
-  }
-</style>
-<title>CS 184 Rasterizer</title>
-<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<link href="https://fonts.googleapis.com/css?family=Open+Sans|Source+Sans+Pro" rel="stylesheet">
+<html xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
+	<head>
+	<style>
+		table {
+			font-family: arial, sans-serif;
+			border-collapse: collapse;
+			width: 100%;
+			margin: auto;
+		}
+
+		td, th {
+			border: 1px solid #dddddd;
+			text-align: left;
+			padding: 8px;
+		}
+
+		tr:nth-child(even) {
+			background-color: #dddddd;
+		}
+	</style>
 </head>
+	<body>
 
 
-<body>
+	<h1>CS184 Final Project: Rendering Velvet Skirts</h1>
+	<h4>Team: Jessica Dong, Kelly Li, Kaiona Martinson, Jennifer Yang</h4>
+	<h2><a href="https://drive.google.com/file/d/17z3JwDzp23XD4tda20C_WA69vgi0jmut/view?usp=sharing">Final Video</a></h2>
 
-<h1 align="middle">CS 184: Computer Graphics and Imaging, Spring 2022</h1>
-<h1 align="middle">Final Project: Velvet Skirts</h1>
-<h2 align="middle">JESSICA DONG, KELLY LI, KAIONA MARTINSON, JENNIFER YANG</h2>
+	<h2>Abstract</h2>
 
-<br><br>
+		<p1>The clothing industry produces 10% of the world’s global carbon emissions. Additionally, each season, clothes are
+			overproduced by 30 to 40%. We wanted to take a stab at rendering clothing since modeling clothing with graphics
+			can help reduce waste when designing clothing, mocking up prototypes without directly using expensive fabric,
+			and online shopping. We decided to render a velvet skirt because velvet has a lot of interesting properties.
+			Specifically, the color of velvet can change depending on the direction of the fibers or the perspective you’re
+			looking at it from.</p1>
 
-    <div>
+	<h2>Technical Approach</h2>
 
-        <h2 align="middle">Abstract</h2>
-        <p>
-            The clothing industry produces 10% of the world’s global carbon emissions.
-            Additionally, each season, clothes are overproduced by 30 to 40%.
-            We wanted to take a stab at rendering clothing since modeling clothing with graphics can help reduce waste when designing clothing,
-            mocking up prototypes without directly using expensive fabric, and online shopping.
-            We decided to render a velvet skirt because velvet has a lot of interesting properties.
-            Specifically, the color of velvet can change depending on the direction of the fibers or the perspective you’re looking at it from.
+		<p1>The references for both the velvet and skirt were mainly used as starting points for our project, with the velvet
+			features in the project mostly being done by eye.</p1>
+	<h3>Velvet</h3>
+		<ul>
+			<li>For the velvet, we referenced Google’s github site for the Filament project, which helped us determine
+				the base color (ambient coefficient) to be black, as well as the relation between the diffuse color
+				and sheen color (specular).</li>
+			<li>We modified the existing blinn-phong coefficients to render a more realistic velvet. We changed the
+				diffuse coefficient to a red color to make our base cloth red, the ambient coefficient to a black
+				color to make the shadows darker, and the specular coefficient to a brighter red (instead of white)
+				to make the fabric look less like latex / metal.</li>
+			<li>We also increased the spring constant and density of the fabric in the clothSim gui to make our
+				fabric heavier, as well as adding bump mapping with an image of a red velvet from Google.</li>
+			<li>We referenced a KeyShot article that described different features of velvet like sheen, roughness,
+				backscatter, and edginess to ballpark the variable values that would make our velvet look more
+				realistic.</li>
+			<img src="images/latest_velvet_1.png" style="float: center; width:50%;margin-right:50%">
+			<figcaption align="left">Velvet on ball</figcaption>
+		</ul>
+		
+		
+	
+	<h3>Skirt</h3>
+		<ul>
+			<li>For the skirt, we referenced the paper, A 3D Design System of Skirt Profile Based on OpenGL, that got
+				us started on the basic skirt shape. We made a series of circles of varying radius size and height.
+				We started with a circle with radius size = width / 4 and height = height. We incremented the radius
+				size and decremented height by an offset to get num_height_points circles, where the bottom circle
+				has a radius size = width and height = 0. For each circle, we had num_width_points number of point
+				masses, each with position (radius size * cos(Θ), height, radius size * sin(Θ)), where Θ ranged from
+				0 to 2π. We got the equations from the paper.</li>
 
-        </p>
+			<li>We then connected the point masses with springs like in project 4: structural constraint between a
+				point mass and the point mass to its left and above it, shearing constraints between a point mass
+				and the point mass to its diagonal upper left and its diagonal upper right, and bending constraints
+				between a point mass and the point mass two to its left and two above it.</li>
+			<img src="images/mirrorskirt.png"style="float: left; width: 50%; margin-right: 50%">
+			<figcaption align="left">Preliminary skirt with mirror shading</figcaption>
+			<br />
+			<li>For all the circles, we pinned every fifth point mass to create a pleat effect that was visible once
+				we started the simulation and accounted for the effect of gravity on the skirt. We did the pleat
+				effect by eye. </li>
+			<img src="images/struct.png"style="float: left; width: 50%; margin-right: 50%">
+			<figcaption align="left">Adding hem and pins to the skirt</figcaption>
 
-        <h2 align="middle">Technical Approach</h2>
-
-        <p>
-            The references for both the velvet and skirt were mainly used as starting points for our project,
-            with the velvet features in the project mostly being done by eye.
-        </p>
-
-        <h3 align="middle">Velvet Fabric </h3>
-
-        <p>
-            For the velvet, we referenced Google’s github site for the Filament project,
-            which helped us determine the base color (ambient coefficient) to be black, 
-            as well as the relation between the diffuse color and sheen color (specular).
-            <br />
-            We modified the existing blinn-phong coefficients to render a more realistic velvet. We changed the diffuse coefficient to a red color to make our base cloth red, the ambient coefficient to a black color to make the shadows darker, and the specular coefficient to a brighter red (instead of white) to make the fabric look less like latex / metal.
-            We also increased the spring constant and density of the fabric in the clothSim gui to make our fabric heavier, as well as adding bump mapping with an image of a red velvet from Google.
-            We referenced a KeyShot article that described different features of velvet like sheen, roughness, backscatter, and edginess to ballpark values that would make our velvet look more realistic.
-
-        </p>
-
-        <p>
-            
-        </p>
-
-        <div align="middle">
-            <img src="images/task1_interestingjaggies.png" align="middle" width="600px" />
-        </div>
-
-
-        <p>Here is an example 2x2 gridlike structure using an HTML table. Each <b>tr</b> is a row and each <b>td</b> is a column in that row. You might find this useful for framing and showing your result images in an organized fashion.</p>
-
-
-        <h3 align="middle">Part 2: Antialiasing triangles</h3>
-
-        <p>
-            Our algorithm split each pixel into <i>sample_rate]</i> amount of pixels 
-            (ie: if <i>sample_rate</i> = 4, our pixel was split into quarters). 
-            (which is larger in size than the framebuffer). 
-            Afterwards, we took all the samples in the sample_buffer that corresponded to a pixel 
-            and took the average of the RGB values. 
-            The resulting colors were then put into our framebuffer.
-        </p>
-
-        <p>
-            Supersampling is useful because it can get rid of jaggies 
-            in an image where there is a sudden change in frequency.
-        </p>
-        
-        <p>
-            Modifications were made to the rasterization pipeline via the 
-            <i>resolve_to_framebuffer()</i> function by updating it to take the average color of a <i>sample_rate</i> 
-            amount of pixels for a single pixel in the frame buffer. 
-            We also changed how much the sample_buffer is resized in the functions <i>set_sample_rate()</i>
-            and <i>set_framebuffer_target()</i> to reflect the impact of the <i>sample_rate</i>.
-        </p>
-
-        <p>
-            We were able to antialias our triangles with supersampling because we could effectively “blur”
-            any sudden changes in frequencies. We were able to do this with the samples because we took the average
-            of the colors and put those values into the framebuffer.
-        </p>
-
-        <div align="middle">
-            <table style="width=100%">
-                <tr>
-                    <td>
-                        <img src="images/task2_1.png" align="middle" width="350px" />
-                        <figcaption align="middle">sample_rate = 1</figcaption>
-                    </td>
-                    <td>
-                        <img src="images/task2_4.png" align="middle" width="350px" />
-                        <figcaption align="middle">sample_rate = 4</figcaption>
-                    </td>
-                    <td>
-                        <img src="images/task2_16.png" align="middle" width="350px" />
-                        <figcaption align="middle">sample_rate = 16</figcaption>
-                    </td>
-                </tr>
-            </table>
-        </div>
-        
-        <p>
-            Sample rate 1: With a sampling rate of 1, we see no anti aliasing effects. There are still jaggies and the skinny red triangle corner is all one solid color (no averaging yet). There is a small segment that is separated from the rest of the triangle.
-        </p>          
-        <p>
-            Sample rate 4: With a sampling rate of 4, we start to see anti aliasing effects as the red color is being blurred into shades of pink. The small separated segment has become a bit smaller and is colored lighter due to averaging red with white.
-        </p>
-        <p>
-            Sample rate 16: With a sampling rate of 16, we can see the triangle corner is very blurred in red and pink. The small separated segment is no longer present and the triangle corner is an extremely light shade of pink (averaged with lots of white).
-        </p>
-
-        <h3 align="middle">Part 3: Transforms</h3>
-        
-        <div align="center">
-            <img src="images/task3.png" align="middle" width="600px" />
-        </div>
-
-        <p>
-            We made our robot stretch in the YMCA “Y” pose.
-            After scaling the arms (this part was already in the code),
-            we rotated his left and right arms by 70 and -70 degrees respectively and then adjusted the translation 
-            (translate(80 -70) in the right arm and translate(-80, -70) in the left)
-            to make his arms look like they connected at the top of his torso.
-        </p>
+			<li>After combining our custom .frag velvet fragment and skirt grid, we added a couple of modifications
+				to make the overall skirt shape more realistic (more “hip” since we added a hip :D). To make the skirt
+				less conic after the simulation starts, we included a variable named taper to decrease how much the
+				radius increases by as we go down the skirt. We also included a variable that controls when the
+				pleated pins stop (around 30% down from the waistband), thus allowing the rest of the fabric to drape
+				down naturally with gravitational force. This made the skirt look less tent-like and more curved.</li>
+		</ul>
+	
+	
 
 
-        <h2 align="middle">Section II: Sampling</h2>
-
-        <h3 align="middle">Part 4: Barycentric coordinates</h3>
-        <p>
-            Using the line equation that is used in point-in-triangle tests, we find the line equation values for point A respective to line BC, B respective to AC, and C respective to AB. 
-            To find the barycentric coordinates of a given point, we would find its line equation values with respect to each of the triangle’s lines, and we divide by the line equation value of the vertex not included in the line. 
-            Using point A, B, and C will give us alpha, beta, gamma respectively. 
-            We then normalize the values so that alpha + beta + gamma = 1. Thus, the point’s barycentric coordinate is (alpha, beta, gamma). 
-            To find the color we should fill the point with, we add together A, B, and C’s colors with the equation alpha * A + beta * B + gamma * C.
-            As we can see in the triangle with one red, one green, and one blue vertex, points closer to the red vertex are more red while points closer to the middle of the triangle are more brown, as each point has a fairly equal influence on the color.
-        </p>
-        <div align="middle">
-            <img src="images/task4_triangle.png" align="middle" width="600px" />
-        </div>
-        <div align="middle">
-            <img src="images/task4_rainbow.png" align="middle" width="600px" />
-        </div>
-
-
-        <h3 align="middle">Part 5: "Pixel sampling" for texture mapping</h3>
-
-        <p>
-            We first convert the x,y pixel coordinate to a u,v texel coordinate by using the pixel’s
-            barycentric coordinates on the triangle vertices’ (u,v) coordinates.
-            In nearest sampling, we rounded the (u,v) coordinate to the closest texel and used that texel’s color
-            for the given pixel. In bilinear sampling, we found the four nearest texels of the (u,v) coordinate
-            and used linear interpolation to determine the color of the pixel from the four texels.
-        </p>
-
-        <div align="center">
-            <table style= "width=100%">
-                <tr>
-                    <td>
-                        <img src="images/task5_nearest_1.png" align="middle" width="400px" />
-                    </td>
-                    <td>
-                        <img src="images/task5_nearest_16.png" align="middle" width="400px" />
-                    </td>
-                </tr>
-            </table>
-        </div>
-        
-        <p>
-            With nearest sampling at 1 sample per pixel, we can see that the edge of the seal has some straggler pixels that are colored in. 
-            This is due to nearest sampling only using the one nearest texel to determine a pixel’s color.
-            Even when our sample size increases to 16, these straggler pixels are still colored in,
-            albeit with lighter colors that are more blended into the white background due to our increased sample size
-            and anti-aliasing.
-        </p>
-
-        <div align="center">
-            <table style="width=100%">
-                <tr>
-                    <td>
-                        <img src="images/task5_bilinear_1.png" align="middle" width="400px" />
-                    </td>
-                    <td>
-                        <img src="images/task5_bilinear_16.png" align="middle" width="400px" />
-                    </td>
-                </tr>
-            </table>
-        </div>
-
-        <p>
-            However, with bilinear sampling, these straggler pixels do not show up since we are taking
-            more surrounding pixels into account and using more lerps to find the color we want our pixel to be.
-            When we increase our sample size from 1 to 16 with bilinear sampling, the edges of the seal are a bit
-            more blurred (as expected from an increase in sample size and anti-aliasing) and we see no straggler pixels.
-        </p>
-
-        <h3 align="middle">Part 6: "Level sampling" with mipmaps for texture mapping</h3>
-
-        <p>
-            Level sampling is the process where we store different “levels” of a high-resolution texture,
-            with each level being a downscaled version of the previous level.
-            This allows us to sample from lower resolution textures when our image needs to be 
-            more blurred / less aliased. This allows us to achieve the supersampling effect of blurring or averaging
-            out of pixels to prevent aliasing, yet we are not increasing the sample rate on each pixel.
-        </p>
-        
-        <h4>How we implemented it:</h4>
-        
-        <p>
-            We were given mipmaps, so all we had to do was calculate the level to sample from and adjusted our level sampling methods based on the input.
-            <br />
-            To calculate the level to sample from, we followed this equation: 
-            <img src="images/task6_equation.png" align="middle"width="400px"/>
-            <br />
-            When lsm was L_ZERO, we defaulted to the 0th level (the original texture).
-            <br />
-            When lsm was L_NEAREST, we followed this equation to calculate the level and rounded the number to get our nearest integer level.
-            <br />
-            When lsm was L_LINEAR, we followed the equation to calculate the level but did not round the number to get our nearest integer level.
-            We floored this continuous number to get the first level D and did linear interpolation with the floored level D and the next level D + 1 to get the final color.
-        </p>
-
-        <h4>Tradeoffs</h4>
-    
-        <p>Supersampling</p>
-
-        <p>
-            Increasing the number of samples per pixel greatly increases the antialiasing power by averaging out the different samples,
-            but it uses much more memory since we have to increase the sample_buffer by a factor of sample_rate.
-            The speed at which we render the image also slows by a factor of sample_rate.
-        </p>
-
-        <p>Level Sampling</p>
-
-        <p>
-            Level sampling has great antialiasing power and is more efficient than increasing
-            the number of samples per pixel since the number of samples remains the same,
-            but it does require additional memory to store the various mipmap levels.
-            However, the memory usage is still less than supersampling since supersampling requires width * height * sample_rate amount of memory,
-            while mipmaps require O(width * height) memory.
-            It is able to blur the image more efficiently than supersampling and at a faster speed.
-        </p>
-
-        <p>Pixel Sampling</p>
-
-        <p>
-            Pixel sampling does not have high antialiasing power compared to level sampling and number of samples per pixel,
-            but changing from nearest to bilinear pixel sampling does have some anti aliasing effects.
-            Its overall memory usage is less than both level sampling and supersampling,
-            since there is a max of four samples per pixel (not reliant on a sample rate),
-            and it does not require the storing of additional textures. 
-            Its speed is similar to level sampling, since they both use the nearest and bilinear sampling techniques.
-        </p>
-
-        
-        <div align="middle">
-            <table style="width=100%">
-                <tr>
-                    <td>
-                        <img src="images/task6_l_zero_p_nearest.png" align="middle" width="400px" />
-                        <figcaption align="middle">L_ZERO and P_NEAREST</figcaption>
-                    </td>
-                    <td>
-                        <img src="images/task6_l_zero_p_linear.png" align="middle" width="400px" />
-                        <figcaption align="middle">L_ZERO and P_LINEAR</figcaption>
-                    </td>
-                </tr>
-                <br />
-                <tr>
-                    <td>
-                        <img src="images/task6_l_nearest_p_nearest.png" align="middle" width="400px" />
-                        <figcaption align="middle">L_NEAREST and P_NEAREST</figcaption>
-                    </td>
-                    <td>
-                        <img src="images/task6_l_nearest_p_linear.png" align="middle" width="400px" />
-                        <figcaption align="middle">L_NEAREST and P_LINEAR</figcaption>
-                    </td>
-                </tr>
-            </table>
-        </div>
+	<h2>Problems Encountered</h2>
+	<ul>
+		<li>We initially drafted up a skirt in Blender but had issues with importing the model into our code. We then
+			decided to render the skirt using point masses and springs like in project 4.
+			<img src="images/skirt_blender.png"style="float: left; width: 50%; margin-right: 50%;">
+			<figcaption align="left">Skirt in Blender</figcaption>
+			<br/>
+		</li>
+		<li>We encountered an issue where there was an apparent side seam missing from the skirt. Though our wireframe
+			was correct, the original clothsim expected the cloth to be rectangular in shape, thus the code for creating
+			the clothmesh which allows for the rendering of fabric color did not allow for a conically-shaped piece of
+			fabric. To fix this, we altered the buildClothMesh function in cloth.cpp to check when the pointmass was the
+			last pointmass in its row, in which we would create triangles that connect back to the first pointmasses in
+			the row. This ended up fixing the gap.
+			<img src="images/skirt_wireframe.png"style="float: left; width: 50%; margin-right: 50%;">
+			<figcaption align="left">Conic wireframe with no gaps</figcaption>
+			<br />
+			<img src="images/skirt_seam.png"style="float: left; width: 50%; margin-right: 50%;">
+			<figcaption align="left">Before seam fix</figcaption>
+			<br />
+			<img src="images/cone_no_seams.png"style="float: left; width: 50%; margin-right: 50%;">
+			<figcaption align="left">After seam fix</figcaption>
+			<br />
+		</li>
+	</ul>
 
 
-        </div></body>
+
+
+ <h2>Lessons Learned</h2>
+	<ul>
+		<li>This was our first time using Blender, so that definitely came with a learning curve full of watching video
+			tutorials and playing around with the software.</li>
+		<li>Since we only had experience with making flat rectangular grids from the clothsim project, making the conic
+			shape was a valuable learning experience.  </li>
+		<li>Velvet has some cool anisotropic features that can be approximated by eye. We did a lot of eye-balling to get
+			realistic-looking fabric. </li>
+	</ul>
+<h2>Results</h2>
+	<img src="images/skirt_gif.gif" style="float: left; width: 50%; margin-right: 50%;">
+	<figcaption align="left">Final velvet skirt in motion</figcaption>
+	<br />
+	
+	<img src="images/skirt_w_texture_05-04.png"style="float: left; width: 50%; margin-right: 50%;">
+	<figcaption align="left">Final velvet skirt at resting state with bump mapping</figcaption>
+	<br />
+
+	<img src="images/satin_skirt.png"style="float: left; width: 50%; margin-right: 50%;">
+	<figcaption align="left">Satin skirt</figcaption>
+
+	<br />
+
+
+	<h2>References</h2>
+		<p1>Guy, Romain, and Mathias Agopian. Filament Materials Guide,</p1>
+	<a href="https://google.github.io/filament/Materials.html#materialmodels/litmodel/anisotropy.">https://google.github.io/filament/Materials.html#materialmodels/litmodel/anisotropy.</a>
+	</br>
+		<p1>Velvet Keyshot Manual, 12 Mar. 2021,</p1>
+
+	<a href="https://manual.keyshot.com/manual/materials/material-types/advanced-material/velvet/">https://manual.keyshot.com/manual/materials/material-types/advanced-material/velvet/</a>
+		</br>
+		<p1>Xu, Jun, and Xiaobo Wang. A 3D Design System of Skirt Profile Based on OpenGL.  </p1>
+	<a href="https://www.researchgate.net/publication/344563718_A_3D_Design_System_of_Skirt_Profile_Based_on_OpenGL.">https://www.researchgate.net/publication/344563718_A_3D_Design_System_of_Skirt_Profile_Based_on_OpenGL.</a>
+
+	<h2> Contributions from each team member</h2>
+	<ul>
+		<li>We worked in pairs, and the project was mainly split into the velvet fabric and the skirt. </li>
+		<li>Kelly and Jennifer:
+			<ul>
+				<li>Pair-programmed together via zoom</li>
+				<li>Rendered velvet fabric and satin fabric</li>
+				<li>Added skirt tapering and control of length of pinned pleats for more natural skirt look</li>
+				<li>Fixed open seam issue</li>
+			</ul>
+		</li>
+		<li>Kaiona and Jessica:
+			<ul>
+				<li>Worked together and gave each other updates on progress</li>
+				<li>Rendered skirt shape in Blender</li>
+				<li>Modified buildGrid in cloth.cpp to render skirt shape</li>
+			</ul>
+		</li>
+	</ul>
+
+
+
+	</body>
+
 </html>
